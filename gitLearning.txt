@@ -270,6 +270,7 @@ $ git config --global color.ui true
 
 
 hello world
+myname lidekang
 
 
 
