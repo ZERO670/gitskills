@@ -1,0 +1,283 @@
+$ git config --global user.name "Your Name"
+$ git config --global user.email "email@example.com"
+git分布式版本控制软件, 每台机器自报家门
+
+
+$ mkdir learngit
+$ cd learngit
+$ pwd
+/Users/michael/learngit
+创建版本库,又名仓库 repository
+
+
+$ git init
+Initialized empty Git repository in /Users/michael/learngit/.git/
+把目录变成git可以管理的仓库
+
+$ git add readme.txt
+把文件添加到仓库
+
+git commit -m "每次提交记录"
+$ git add file1.txt
+$ git add file2.txt file3.txt
+$ git commit -m "add 3 files."
+把文件提交到仓库
+
+git status
+$ git status
+# On branch master
+# Changes not staged for commit:
+#   (use "git add <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#    modified:   readme.txt
+#
+no changes added to commit (use "git add" and/or "git commit -a")
+在提交之前进行查看修改的状态
+
+git diff
+查看修改的内容
+
+git log
+git log命令显示从最近到最远的提交日志
+
+先用git log 查看提交日志
+commit 后面的是版本ID
+可以利用hard 退到相应的时间
+git reset --hard 六位ID   回到相应的时间点
+
+Git提供了一个命令git reflog用来记录你的每一次命令
+
+小结
+
+现在总结一下：
+
+HEAD指向的版本就是当前版本，因此，Git允许我们在版本的历史之间穿梭，使用命令git reset --hard commit_id。
+
+穿梭前，用git log可以查看提交历史，以便确定要回退到哪个版本。
+
+要重返未来，用git reflog查看命令历史，以便确定要回到未来的哪个版本。
+
+
+git add 把文件添加到暂存区
+git commit 提交更改   将暂存区的所有内容提交到当前分支
+
+
+你可以发现，Git会告诉你，git checkout -- file可以丢弃工作区的修改：
+$ git checkout -- readme.txt
+
+rm readme.txt删除文件
+
+要关联一个远程库，使用命令git remote add origin git@server-name:path/repo-name.git；
+
+关联后，使用命令git push -u origin master第一次推送master分支的所有内容；
+
+此后，每次本地提交后，只要有必要，就可以使用命令git push origin master推送最新修改；
+
+分布式版本系统的最大好处之一是在本地工作完全不需要考虑远程库的存在，也就是有没有联网都可以正常工作，而SVN在没有联网的时候是拒绝干活的！当有网络的时候，再把本地提交推送一下就完成了同步，真是太方便了！
+
+现在，远程库已经准备好了，下一步是用命令git clone克隆一个本地库：
+
+$ git clone git@github.com:michaelliao/gitskills.git
+Cloning into 'gitskills'...
+remote: Counting objects: 3, done.
+remote: Total 3 (delta 0), reused 0 (delta 0)
+Receiving objects: 100% (3/3), done.
+ 
+$ cd gitskills
+$ ls
+README.md
+
+要克隆一个仓库，首先必须知道仓库的地址，然后使用git clone命令克隆。
+
+Git支持多种协议，包括https，但通过ssh支持的原生git协议速度最快。
+
+分支管理
+
+下面开始实战。
+
+首先，我们创建dev分支，然后切换到dev分支：
+
+$ git checkout -b dev
+Switched to a new branch 'dev'
+git checkout命令加上-b参数表示创建并切换，相当于以下两条命令：
+
+$ git branch dev
+$ git checkout dev
+Switched to branch 'dev'
+然后，用git branch命令查看当前分支：
+
+$ git branch
+* dev
+  master
+git branch命令会列出所有分支，当前分支前面会标一个*号。
+
+然后，我们就可以在dev分支上正常提交，比如对readme.txt做个修改，加上一行：
+
+Creating a new branch is quick.
+然后提交：
+
+$ git add readme.txt 
+$ git commit -m "branch test"
+[dev fec145a] branch test
+ 1 file changed, 1 insertion(+)
+现在，dev分支的工作完成，我们就可以切换回master分支：
+
+$ git checkout master
+Switched to branch 'master'
+
+现在，我们把dev分支的工作成果合并到master分支上：
+
+$ git merge dev
+Updating d17efd8..fec145a
+Fast-forward
+ readme.txt |    1 +
+ 1 file changed, 1 insertion(+)
+git merge命令用于合并指定分支到当前分支。合并后，再查看readme.txt的内容，就可以看到，和dev分支的最新提交是完全一样的。
+
+注意到上面的Fast-forward信息，Git告诉我们，这次合并是“快进模式”，也就是直接把master指向dev的当前提交，所以合并速度非常快。
+
+当然，也不是每次合并都能Fast-forward，我们后面会讲其他方式的合并。
+
+合并完成后，就可以放心地删除dev分支了：
+
+$ git branch -d dev
+Deleted branch dev (was fec145a).
+删除后，查看branch，就只剩下master分支了：
+
+$ git branch
+* master
+因为创建、合并和删除分支非常快，所以Git鼓励你使用分支完成某个任务，合并后再删掉分支，这和直接在master分支上工作效果是一样的，但过程更安全。
+
+当Git无法自动合并分支时，就必须首先解决冲突。解决冲突后，再提交，合并完成。
+
+用git log --graph命令可以看到分支合并图。
+
+修复bug时，我们会通过创建新的bug分支进行修复，然后合并，最后删除；
+
+当手头工作没有完成时，先把工作现场git stash一下，然后去修复bug，修复后，再git stash pop，回到工作现场。
+
+
+
+Feature分支
+
+阅读: 294825
+软件开发中，总有无穷无尽的新的功能要不断添加进来。
+
+添加一个新功能时，你肯定不希望因为一些实验性质的代码，把主分支搞乱了，所以，每添加一个新功能，最好新建一个feature分支，在上面开发，完成后，合并，最后，删除该feature分支。
+
+现在，你终于接到了一个新任务：开发代号为Vulcan的新功能，该功能计划用于下一代星际飞船。
+
+于是准备开发：
+
+$ git checkout -b feature-vulcan
+Switched to a new branch 'feature-vulcan'
+5分钟后，开发完毕：
+
+$ git add vulcan.py
+$ git status
+# On branch feature-vulcan
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#       new file:   vulcan.py
+#
+$ git commit -m "add feature vulcan"
+[feature-vulcan 756d4af] add feature vulcan
+ 1 file changed, 2 insertions(+)
+ create mode 100644 vulcan.py
+切回dev，准备合并：
+
+$ git checkout dev
+一切顺利的话，feature分支和bug分支是类似的，合并，然后删除。
+
+但是，
+
+就在此时，接到上级命令，因经费不足，新功能必须取消！
+
+虽然白干了，但是这个分支还是必须就地销毁：
+
+$ git branch -d feature-vulcan
+error: The branch 'feature-vulcan' is not fully merged.
+If you are sure you want to delete it, run 'git branch -D feature-vulcan'.
+销毁失败。Git友情提醒，feature-vulcan分支还没有被合并，如果删除，将丢失掉修改，如果要强行删除，需要使用命令git branch -D feature-vulcan。
+
+现在我们强行删除：
+
+$ git branch -D feature-vulcan
+Deleted branch feature-vulcan (was 756d4af).
+终于删除成功！
+
+查看远程库信息:
+git remote -v
+
+推送分支
+git push origin 分支名
+
+但是，并不是一定要把本地分支往远程推送，那么，哪些分支需要推送，哪些不需要呢？
+
+master分支是主分支，因此要时刻与远程同步；
+
+dev分支是开发分支，团队所有成员都需要在上面工作，所以也需要与远程同步；
+
+bug分支只用于在本地修复bug，就没必要推到远程了，除非老板要看看你每周到底修复了几个bug；
+
+feature分支是否推到远程，取决于你是否和你的小伙伴合作在上面开发。
+
+总之，就是在Git中，分支完全可以在本地自己藏着玩，是否推送，视你的心情而定！
+
+
+标签:
+创建标签
+git tag v1.0
+查看标签
+git tag
+Git的标签虽然是版本库的快照，但其实它就是指向某个commit的指针
+显示具体标签的信息
+git show v1.0
+
+crtl+c退出git log命令
+
+
+如果标签打错了，也可以删除：
+$ git tag -d v0.1
+如果要推送某个标签到远程，使用命令git push origin <tagname>：
+
+小结
+
+命令git push origin <tagname>可以推送一个本地标签；
+
+命令git push origin --tags可以推送全部未推送过的本地标签；
+
+命令git tag -d <tagname>可以删除一个本地标签；
+
+命令git push origin :refs/tags/<tagname>可以删除一个远程标签。
+小结
+
+在GitHub上，可以任意Fork开源仓库；
+
+自己拥有Fork后的仓库的读写权限；
+
+可以推送pull request给官方仓库来贡献代码。
+
+在安装Git一节中，我们已经配置了user.name和user.email，实际上，Git还有很多可配置项。
+
+比如，让Git显示颜色，会让命令输出看起来更醒目：
+
+$ git config --global color.ui true
+这样，Git会适当地显示不同的颜色，比如git status命令：
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
